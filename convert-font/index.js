@@ -27,12 +27,23 @@ function output2pbf(font, start, end, outputDir) {
 }
 
 glob("./fonts/*/*.ttf", null, function (er, files) {
+  var listFonts = {};
   for(var i=0; i<files.length; i++){
     var path = files[i].split("/");
+    var group = path[path.length - 2].replace(/-/g, " ").replace(/\w\S*/g, function(txt){
+        return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
+    });
+    listFonts[group] = listFonts[group] || [];
+    
     var name = path[path.length - 1].split(".")[0];
+    listFonts[group].push(name);
+
     console.log("Converting font: "+name+"...");
     var folder = "./pbf/"+name;
     if(!fs.existsSync(folder)) fs.mkdirSync(folder);
-    convert(files[i], folder+"/"); 
+    convert(files[i], folder+"/");
   }
+
+  fs.writeFile('fonts.json', JSON.stringify(listFonts), 'utf8', function(err){
+	});
 });
