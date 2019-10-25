@@ -1,6 +1,8 @@
 var fontnik = require('fontnik');
 var fs = require('fs');
 var path = require('path');
+var glob = require("glob");
+
 
 var convert = function(fileName, outputDir) {
     var font = fs.readFileSync(path.resolve(__dirname + "/" + fileName));
@@ -24,4 +26,13 @@ function output2pbf(font, start, end, outputDir) {
     });
 }
 
-convert("./fonts/NotoSansHans-Regular.otf", "./pbf/");
+glob("./fonts/*/*.ttf", null, function (er, files) {
+  for(var i=0; i<files.length; i++){
+    var path = files[i].split("/");
+    var name = path[path.length - 1].split(".")[0];
+    console.log("Converting font: "+name+"...");
+    var folder = "./pbf/"+name;
+    if(!fs.existsSync(folder)) fs.mkdirSync(folder);
+    convert(files[i], folder+"/"); 
+  }
+});
